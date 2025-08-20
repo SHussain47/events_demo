@@ -55,14 +55,44 @@ function ToppingForm() {
     <button type="submit" data-action="sortAll">Sort All</button>
   `;
 
-  // Add Listener to respond to interactions 
+  // Add Listener to respond to interactions
   $form.addEventListener("submit", function (event) {
     // Prevent the page from refreshing / default action
     event.preventDefault();
-    console.log("evenet : ", event.submitter.dataset.action);
+    // Storing users action ** data-action - fro innerHTML
+    const action = event.submitter.dataset.action;
+    const data = new FormData($form);
+    // Storing users inputted topping
+    const userInputtedTopping = data.get("topping").trim().toLowerCase();
+
+    // Button Logic
+    if (action === "add" && userInputtedTopping !== "") {
+      addToppings(userInputtedTopping);
+    } else if (action === "sortOne") {
+      sortOne();
+    } else if (action === "sortAll") {
+      sortAll();
+    }
   });
 
   return $form;
+}
+
+function ToppingGroup(label, items) {
+  const $section = document.createElement("section");
+  $section.innerHTML = `
+    <h2>${label}</h2>
+    <ul></ul>
+  `;
+  const $ul = $section.querySelector("ul");
+
+  items.forEach((item) => {
+    const $li = document.createElement("li");
+    $li.textContent = item;
+    $ul.appendChild($li);
+  });
+
+  return $section;
 }
 
 ToppingForm();
@@ -73,9 +103,17 @@ function render() {
   $root.innerHTML = `
     <h1>Pizza Topping Sorter</h1>
     <ToppingForm></ToppingForm>
+    <ToppingGroup id="list"></ToppingGroup>
+    <ToppingGroup id="veggie"></ToppingGroup>
+    <ToppingGroup id="meat"></ToppingGroup>
+    <ToppingGroup id="others"></ToppingGroup>
   `;
 
   $root.querySelector("ToppingForm").replaceWith(ToppingForm());
+  $root.querySelector("ToppingGroup#list").replaceWith(ToppingGroup("ToppingList", toppings));
+  $root.querySelector("ToppingGroup#veggie").replaceWith(ToppingGroup("Veggies", veggies));
+  $root.querySelector("ToppingGroup#meat").replaceWith(ToppingGroup("Meats", meats));
+  $root.querySelector("ToppingGroup#others").replaceWith(ToppingGroup("Others", others));
 }
 
 render();
